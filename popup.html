@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>AppliAssist</title>
+    <style>
+        body {
+            width: 320px;
+            padding: 0 0 15px 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header-section {
+            background-color: #e3f2fd;
+            padding: 20px 15px;
+            border-bottom: 1px solid #bbdefb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            display: block;
+        }
+
+        h3 {
+            margin: 0;
+            color: #1565c0;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .main-content {
+            padding: 15px;
+        }
+
+        .theme-switch-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+        }
+
+        #themeToggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        #themeToggle:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        body.dark-mode #themeToggle {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+
+        .badge-container {
+            display: none;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            border: 1px solid #c8e6c9;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            box-sizing: border-box;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+        }
+
+        /* History Section Styles */
+        #historySection {
+            margin-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        .history-card {
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .history-card:hover {
+            border-color: #2563eb;
+            transform: translateX(2px);
+        }
+
+        body.dark-mode {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        body.dark-mode .header-section {
+            background-color: #1a1a1a;
+            border-bottom-color: #333;
+        }
+
+        body.dark-mode .history-card {
+            background: #1e293b;
+            border-color: #334155;
+            color: #f1f5f9;
+        }
+
+        body.dark-mode #historySection {
+            border-top-color: #334155;
+        }
+
+        body.dark-mode #status {
+            color: #f1f5f9 !important;
+            line-height: 1.6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 15px;
+            border-radius: 8px;
+            width: 85%;
+            max-height: 70%;
+            overflow-y: auto;
+            font-size: 11px;
+            white-space: pre-wrap;
+            color: #333;
+        }
+
+        body.dark-mode .modal-content {
+            background-color: #252525;
+            color: #eee;
+        }
+
+        .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-section">
+        <div class="header-container">
+            <img src="icons/icon.png" class="logo-icon" alt="AppliAssist Logo">
+            <h3>AppliAssist</h3>
+        </div>
+    </div>
+
+    <div class="theme-switch-wrapper">
+        <button id="themeToggle" title="Toggle Dark Mode">
+            <span id="themeIcon">🌙</span>
+            <span id="themeText">Dark Mode</span>
+        </button>
+    </div>
+
+    <div class="main-content">
+        <div id="resumeBadge" class="badge-container">
+            <div>
+                <span class="badge-text">&check; Resume Loaded</span>
+                <span id="viewResume"
+                    style="text-decoration: underline; cursor: pointer; font-size: 11px; margin-left: 5px; opacity: 0.8;">(View
+                    Text)</span>
+            </div>
+            <span id="clearResume"
+                style="background: #ffcdd2; color: #c62828; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Clear</span>
+        </div>
+
+        <div id="uploadSection">
+            <label>Upload Resume (DOCX)</label>
+            <input type="file" id="resumeUpload" accept=".docx" />
+        </div>
+
+        <div id="apiKeySection" style="margin: 12px 0;">
+            <label>Gemini API Key</label>
+            <input type="password" id="apiKeyInput" placeholder="Paste your key" style="width: 100%; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: 'Inter', sans-serif; font-size: 12px;" />
+            <div style="display: flex; gap: 8px;">
+                <button id="saveApiKeyBtn" style="padding: 10px; font-size: 12px;">Save Key</button>
+                <button id="clearApiKeyBtn" style="padding: 10px; font-size: 12px; background: #ef4444;">Clear Key</button>
+            </div>
+            <p id="apiKeyStatus" style="margin: 8px 0 0 0; font-size: 11px; color: #64748b;">No key saved</p>
+        </div>
+
+        <label>Application Question</label>
+        <textarea id="questionInput" placeholder="Paste the question here..."></textarea>
+        <button id="generateBtn">Generate Answer</button>
+
+        <div id="loader" class="spinner"></div>
+        <p id="status"></p>
+
+        <div id="historySection">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <label style="margin: 0;">Previous Answers</label>
+                <span id="clearHistory"
+                    style="font-size: 10px; color: #ef4444; cursor: pointer; text-decoration: underline;">Clear
+                    All</span>
+            </div>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <div id="resumeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal"
+                style="float: right; font-weight: bold; cursor: pointer; color: #999;">&times;</span>
+            <div id="resumeTextContent"></div>
+        </div>
+    </div>
+
+    <script src="mammoth.js"></script>
+    <script src="popup.js"></script>
+</body>
+
+</html>
