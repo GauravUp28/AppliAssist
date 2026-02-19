@@ -1,4 +1,4 @@
-# AppliAssist
+﻿# AppliAssist
 
 <p align="center">
   <img src="icons/icon.png" alt="AppliAssist Logo" width="120" />
@@ -16,7 +16,7 @@ AppliAssist helps generate concise application responses using:
 - the job description on the active page
 - your own Gemini API key
 
-## ✨ Features
+## Features
 
 - Resume upload and local parsing (`.docx`)
 - User-managed Gemini API key (saved locally)
@@ -25,14 +25,15 @@ AppliAssist helps generate concise application responses using:
 - Recent answer history in popup
 - Light/Dark theme support
 
-## 🚀 Quick Setup
+## Quick Setup
 
 1. Clone this repository.
 2. Open `chrome://extensions/`.
 3. Turn on **Developer mode**.
 4. Click **Load unpacked** and select this project folder.
+5. Click the extension icon and paste your Gemini API key into the **Gemini API Key** field to get started.
 
-## 🧠 Usage
+## Usage
 
 1. Open the extension popup.
 2. Paste your Gemini API key and click **Save Key**.
@@ -40,13 +41,13 @@ AppliAssist helps generate concise application responses using:
 4. Open a job post page.
 5. Paste a question and click **Generate Answer**.
 
-## 🔒 Privacy and Security
+## Privacy and Security
 
 - API keys are user-provided and stored in `chrome.storage.local`.
 - No production API key is bundled in this repo.
 - Resume text and answer history are stored locally in the browser profile.
 
-## 📁 Core Files
+## Core Files
 
 - `manifest.json` - extension config and permissions
 - `popup.html` - popup UI
@@ -54,7 +55,7 @@ AppliAssist helps generate concise application responses using:
 - `content.js` - page text reader
 - `mammoth.js` - DOCX text extraction library
 
-## 🔮 What's Next
+## What's Next
 
 - Improve job-description extraction using targeted DOM selectors.
 - Add support for more resume formats (like PDF).
@@ -66,3 +67,4 @@ AppliAssist helps generate concise application responses using:
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
+
