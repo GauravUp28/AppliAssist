@@ -50,6 +50,38 @@
             padding: 15px;
         }
 
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
         .theme-switch-wrapper {
             display: flex;
             justify-content: flex-end;
@@ -143,6 +175,21 @@
             background-color: #ccc;
         }
 
+        .tab-btn {
+            width: auto;
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            box-shadow: none;
+            padding: 8px;
+        }
+
+        .tab-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+
         /* History Section Styles */
         #historySection {
             margin-top: 20px;
@@ -165,6 +212,21 @@
             transform: translateX(2px);
         }
 
+        .history-answer {
+            display: none;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            color: #334155;
+        }
+
+        .history-card.open .history-answer {
+            display: block;
+        }
+
         body.dark-mode {
             background-color: #0f172a;
             color: #f1f5f9;
@@ -181,8 +243,25 @@
             color: #f1f5f9;
         }
 
+        body.dark-mode .history-answer {
+            border-top-color: #334155;
+            color: #e2e8f0;
+        }
+
         body.dark-mode #historySection {
             border-top-color: #334155;
+        }
+
+        body.dark-mode .tab-btn {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+
+        body.dark-mode .tab-btn.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
         }
 
         body.dark-mode #status {
@@ -265,47 +344,56 @@
     </div>
 
     <div class="main-content">
-        <div id="resumeBadge" class="badge-container">
-            <div>
-                <span class="badge-text">&check; Resume Loaded</span>
-                <span id="viewResume"
-                    style="text-decoration: underline; cursor: pointer; font-size: 11px; margin-left: 5px; opacity: 0.8;">(View
-                    Text)</span>
-            </div>
-            <span id="clearResume"
-                style="background: #ffcdd2; color: #c62828; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Clear</span>
+        <div class="tab-nav">
+            <button id="generateTabBtn" class="tab-btn active">Generate</button>
+            <button id="historyTabBtn" class="tab-btn">History</button>
         </div>
 
-        <div id="uploadSection">
-            <label>Upload Resume (DOCX)</label>
-            <input type="file" id="resumeUpload" accept=".docx" />
+        <div id="generateTab" class="tab-panel active">
+            <div id="resumeBadge" class="badge-container">
+                <div>
+                    <span class="badge-text">&check; Resume Loaded</span>
+                    <span id="viewResume"
+                        style="text-decoration: underline; cursor: pointer; font-size: 11px; margin-left: 5px; opacity: 0.8;">(View
+                        Text)</span>
+                </div>
+                <span id="clearResume"
+                    style="background: #ffcdd2; color: #c62828; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">Clear</span>
+            </div>
+
+            <div id="uploadSection">
+                <label>Upload Resume (DOCX)</label>
+                <input type="file" id="resumeUpload" accept=".docx" />
+            </div>
+
+            <div id="apiKeySection" style="margin: 12px 0;">
+                <label>Gemini API Key</label>
+                <input type="password" id="apiKeyInput" placeholder="Paste your key" style="width: 100%; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: 'Inter', sans-serif; font-size: 12px;" />
+                <div style="display: flex; gap: 8px;">
+                    <button id="saveApiKeyBtn" style="padding: 10px; font-size: 12px;">Save Key</button>
+                    <button id="clearApiKeyBtn" style="padding: 10px; font-size: 12px; background: #ef4444;">Clear Key</button>
+                </div>
+                <p id="apiKeyStatus" style="margin: 8px 0 0 0; font-size: 11px; color: #64748b;">No key saved</p>
+            </div>
+
+            <label>Application Question</label>
+            <textarea id="questionInput" placeholder="Paste the question here..."></textarea>
+            <button id="generateBtn">Generate Answer</button>
+
+            <div id="loader" class="spinner"></div>
+            <p id="status"></p>
         </div>
 
-        <div id="apiKeySection" style="margin: 12px 0;">
-            <label>Gemini API Key</label>
-            <input type="password" id="apiKeyInput" placeholder="Paste your key" style="width: 100%; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: 'Inter', sans-serif; font-size: 12px;" />
-            <div style="display: flex; gap: 8px;">
-                <button id="saveApiKeyBtn" style="padding: 10px; font-size: 12px;">Save Key</button>
-                <button id="clearApiKeyBtn" style="padding: 10px; font-size: 12px; background: #ef4444;">Clear Key</button>
+        <div id="historyTab" class="tab-panel">
+            <div id="historySection" style="margin-top: 0; border-top: 0; padding-top: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="margin: 0;">Recent Questions</label>
+                    <span id="clearHistory"
+                        style="font-size: 10px; color: #ef4444; cursor: pointer; text-decoration: underline;">Clear
+                        All</span>
+                </div>
+                <div id="historyList"></div>
             </div>
-            <p id="apiKeyStatus" style="margin: 8px 0 0 0; font-size: 11px; color: #64748b;">No key saved</p>
-        </div>
-
-        <label>Application Question</label>
-        <textarea id="questionInput" placeholder="Paste the question here..."></textarea>
-        <button id="generateBtn">Generate Answer</button>
-
-        <div id="loader" class="spinner"></div>
-        <p id="status"></p>
-
-        <div id="historySection">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <label style="margin: 0;">Previous Answers</label>
-                <span id="clearHistory"
-                    style="font-size: 10px; color: #ef4444; cursor: pointer; text-decoration: underline;">Clear
-                    All</span>
-            </div>
-            <div id="historyList"></div>
         </div>
     </div>
 

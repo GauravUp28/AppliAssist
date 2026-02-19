@@ -1,5 +1,6 @@
 // --- INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
+    initTabs();
     updateUIForSavedResume();
     initTheme();
     renderHistory(); // Load previous answers on startup
@@ -43,6 +44,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- UI UPDATES ---
+function initTabs() {
+    const generateBtn = document.getElementById("generateTabBtn");
+    const historyBtn = document.getElementById("historyTabBtn");
+    const generateTab = document.getElementById("generateTab");
+    const historyTab = document.getElementById("historyTab");
+
+    const setActiveTab = (tabName) => {
+        const showGenerate = tabName === "generate";
+        generateBtn.classList.toggle("active", showGenerate);
+        historyBtn.classList.toggle("active", !showGenerate);
+        generateTab.classList.toggle("active", showGenerate);
+        historyTab.classList.toggle("active", !showGenerate);
+    };
+
+    generateBtn.addEventListener("click", () => setActiveTab("generate"));
+    historyBtn.addEventListener("click", () => setActiveTab("history"));
+}
+
 function initApiKeySettings() {
     const input = document.getElementById("apiKeyInput");
     const saveBtn = document.getElementById("saveApiKeyBtn");
@@ -125,6 +144,15 @@ function initTheme() {
 }
 
 // --- HISTORY LOGIC ---
+function escapeHtml(text) {
+    return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 function renderHistory() {
     const list = document.getElementById("historyList");
     chrome.storage.local.get(["appHistory"], (result) => {
@@ -137,17 +165,22 @@ function renderHistory() {
         list.innerHTML = history.map((item, index) => `
             <div class="history-card" data-index="${index}">
                 <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    ${item.question}
+                    ${escapeHtml(item.question)}
                 </div>
-                <div style="font-size: 10px; opacity: 0.6;">${item.date}</div>
+                <div style="font-size: 10px; opacity: 0.6;">${escapeHtml(item.date)}</div>
+                <div class="history-answer">${escapeHtml(item.answer)}</div>
             </div>
         `).join("");
 
         document.querySelectorAll(".history-card").forEach(card => {
             card.onclick = () => {
-                const item = history[card.dataset.index];
-                document.getElementById("questionInput").value = item.question;
-                displayResult(item.answer);
+                const alreadyOpen = card.classList.contains("open");
+                document.querySelectorAll(".history-card.open").forEach((openCard) => {
+                    openCard.classList.remove("open");
+                });
+                if (!alreadyOpen) {
+                    card.classList.add("open");
+                }
             };
         });
     });
@@ -165,19 +198,10 @@ function saveToHistory(question, answer) {
 
 // --- CORE GENERATION ---
 async function fetchAnswer(resumeText, jobText, questionText, apiKey) {
-    // Check Cache First
-    const res = await new Promise(r => chrome.storage.local.get(["appHistory"], r));
-    const cached = (res.appHistory || []).find(h => h.question.trim() === questionText.trim());
-    
-    if (cached) {
-        displayResult(cached.answer);
-        return;
-    }
-
-    const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
     const loader = document.getElementById("loader");
     const btn = document.getElementById("generateBtn");
+
+    const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const promptText = `You are a software engineer writing application answers. Resume: ${resumeText}. Job: ${jobText}. Question: ${questionText}. Answer in natural human tone, active voice, max 100 words, no contractions, no dashes.`;
 
@@ -223,7 +247,7 @@ function addCopyButton(text) {
         copyBtn.innerText = "Copied!";
     };
     
-    document.querySelector(".main-content").appendChild(copyBtn);
+    document.getElementById("generateTab").appendChild(copyBtn);
 }
 
 // --- CLICK HANDLER ---
