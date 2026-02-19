@@ -1,12 +1,14 @@
 ﻿# AppliAssist
 
 <p align="center">
-  <img src="icons/icon.png" alt="AppliAssist Logo" width="120" />
+  <img src="icons/icon.png" alt="AppliAssist Logo" width="1000" />
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Manifest-V3-blue" alt="Manifest V3" />
+  <img src="https://img.shields.io/badge/Author-Gaurav Upadhyay-red" alt="Author: Gaurav Upadhyay" />
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License: MIT" />
+  
 </p>
 
 > Smart Chrome extension for faster, tailored job application answers.
