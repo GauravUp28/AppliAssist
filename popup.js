@@ -197,13 +197,14 @@ function saveToHistory(question, answer) {
 }
 
 // --- CORE GENERATION ---
-async function fetchAnswer(resumeText, jobText, questionText, apiKey) {
+async function fetchAnswer(resumeText, jobText, questionText, additionalContext, apiKey) {
     const loader = document.getElementById("loader");
     const btn = document.getElementById("generateBtn");
 
     const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    const promptText = `You are a software engineer writing application answers. Resume: ${resumeText}. Job: ${jobText}. Question: ${questionText}. Answer in natural human tone, active voice, max 100 words, no contractions, no dashes.`;
+    const contextSection = additionalContext ? ` Additional Context: ${additionalContext}.` : "";
+    const promptText = `You are a software engineer writing application answers. Resume: ${resumeText}. Job: ${jobText}. Question: ${questionText}.${contextSection} Answer in natural human tone, active voice, max 100 words, no contractions, no dashes.`;
 
     try {
         const response = await fetch(apiEndpoint, {
@@ -253,6 +254,7 @@ function addCopyButton(text) {
 // --- CLICK HANDLER ---
 document.getElementById("generateBtn").addEventListener("click", async () => {
     const question = document.getElementById("questionInput").value;
+    const additionalContext = document.getElementById("contextInput").value.trim();
     const status = document.getElementById("status");
     const apiKey = await getStoredApiKey();
 
@@ -282,25 +284,31 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
                 chrome.storage.local.set({ savedResume: resumeWithLinks }, () => {
                     updateUIForSavedResume();
-                    processAndGenerate(resumeWithLinks, question, apiKey);
+                    processAndGenerate(resumeWithLinks, question, additionalContext, apiKey);
                 });
             };
             reader.readAsArrayBuffer(resumeFile);
         } else if (result.savedResume) {
-            processAndGenerate(result.savedResume, question, apiKey);
+            processAndGenerate(result.savedResume, question, additionalContext, apiKey);
         } else {
             status.innerText = "Please upload a resume.";
         }
     });
 });
 
-function processAndGenerate(resumeText, question, apiKey) {
+function processAndGenerate(resumeText, question, additionalContext, apiKey) {
     document.getElementById("loader").style.display = "block";
     document.getElementById("generateBtn").disabled = true;
     
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, { action: "readJobDescription" }, (response) => {
-            fetchAnswer(resumeText, response ? response.jobText : "Not available", question, apiKey);
+            fetchAnswer(
+                resumeText,
+                response ? response.jobText : "Not available",
+                question,
+                additionalContext,
+                apiKey
+            );
         });
     });
 }
