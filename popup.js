@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const isDark = document.body.classList.toggle("dark-mode");
         const themeIcon = document.getElementById("themeIcon");
         const themeText = document.getElementById("themeText");
-        
+
         if (themeIcon) themeIcon.innerText = isDark ? "☀️" : "🌙";
         if (themeText) themeText.innerText = isDark ? "Light Mode" : "Dark Mode";
         chrome.storage.local.set({ theme: isDark ? "dark" : "light" });
@@ -241,12 +241,12 @@ function addCopyButton(text) {
     copyBtn.innerText = "Copy to Clipboard";
     copyBtn.style.marginTop = "15px";
     copyBtn.style.marginBottom = "10px";
-    
+
     copyBtn.onclick = () => {
         navigator.clipboard.writeText(text);
         copyBtn.innerText = "Copied!";
     };
-    
+
     document.getElementById("generateTab").appendChild(copyBtn);
 }
 
@@ -266,12 +266,23 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         const resumeFile = document.getElementById("resumeUpload").files[0];
         if (resumeFile) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                mammoth.extractRawText({ arrayBuffer: e.target.result }).then(res => {
-                    chrome.storage.local.set({ savedResume: res.value }, () => {
-                        updateUIForSavedResume();
-                        processAndGenerate(res.value, question, apiKey);
-                    });
+            reader.onload = async (e) => {
+                const { value: html } = await mammoth.convertToHtml({ arrayBuffer: e.target.result });
+
+                const doc = new DOMParser().parseFromString(html, "text/html");
+
+                const links = [...doc.querySelectorAll("a[href]")]
+                    .map(a => `${a.textContent?.trim() || "Link"}: ${a.href}`)
+                    .filter(Boolean);
+
+                const plainText = (doc.body?.innerText || "").replace(/\n{3,}/g, "\n\n").trim();
+                const resumeWithLinks = links.length
+                    ? `${plainText}\n\nLinks:\n${links.join("\n")}`
+                    : plainText;
+
+                chrome.storage.local.set({ savedResume: resumeWithLinks }, () => {
+                    updateUIForSavedResume();
+                    processAndGenerate(resumeWithLinks, question, apiKey);
                 });
             };
             reader.readAsArrayBuffer(resumeFile);
