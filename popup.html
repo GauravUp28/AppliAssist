@@ -239,19 +239,63 @@
             color: #334155;
         }
 
-        .copy-history-btn {
+        .saved-answer {
             display: none;
             margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            color: #334155;
+        }
+
+        .history-actions {
+            display: none;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .copy-history-btn {
+            display: none;
             padding: 8px;
             font-size: 11px;
+            width: auto;
+        }
+
+        .save-history-btn {
+            display: none;
+            padding: 8px;
+            font-size: 11px;
+            width: auto;
+            background: #0f766e;
+        }
+
+        .history-action-btn {
+            padding: 8px;
+            font-size: 11px;
+            width: auto;
+        }
+
+        .danger-btn {
+            background: #dc2626;
         }
 
         .history-card.open .history-answer {
             display: block;
         }
 
-        .history-card.open .copy-history-btn {
+        .history-card.open .saved-answer {
             display: block;
+        }
+
+        .history-card.open .history-actions {
+            display: flex;
+        }
+
+        .history-card.open .copy-history-btn,
+        .history-card.open .save-history-btn {
+            display: inline-block;
         }
 
         body.dark-mode {
@@ -271,6 +315,11 @@
         }
 
         body.dark-mode .history-answer {
+            border-top-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .saved-answer {
             border-top-color: #334155;
             color: #e2e8f0;
         }
@@ -423,7 +472,14 @@
         <div id="historyTab" class="tab-panel">
             <div id="historySection" style="margin-top: 0; border-top: 0; padding-top: 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <label style="margin: 0;">Recent Questions</label>
+                    <label style="margin: 0;">⭐ Starred</label>
+                    <span id="clearSavedHistory"
+                        style="font-size: 10px; color: #ef4444; cursor: pointer; text-decoration: underline;">Clear
+                        Saved</span>
+                </div>
+                <div id="savedHistoryList" style="margin-bottom: 14px;"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="margin: 0;">❔ Recent Questions</label>
                     <span id="clearHistory"
                         style="font-size: 10px; color: #ef4444; cursor: pointer; text-decoration: underline;">Clear
                         All</span>

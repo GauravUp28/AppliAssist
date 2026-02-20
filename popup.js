@@ -42,6 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("clearHistory").addEventListener("click", () => {
         chrome.storage.local.set({ appHistory: [] }, () => renderHistory());
     });
+
+    // Clear Saved History
+    const clearSavedHistory = document.getElementById("clearSavedHistory");
+    if (clearSavedHistory) {
+        clearSavedHistory.addEventListener("click", () => {
+            chrome.storage.local.set({ savedHistory: [] }, () => renderHistory());
+        });
+    }
 });
 
 // --- UI UPDATES ---
@@ -182,23 +190,35 @@ function escapeHtml(text) {
 
 function renderHistory() {
     const list = document.getElementById("historyList");
-    chrome.storage.local.get(["appHistory"], (result) => {
+    const savedList = document.getElementById("savedHistoryList");
+    chrome.storage.local.get(["appHistory", "savedHistory"], (result) => {
         const history = result.appHistory || [];
+        const savedHistory = result.savedHistory || [];
+        const savedKeys = new Set(savedHistory.map((item) => buildHistoryKey(item)));
+
+        renderSavedHistory(savedList, savedHistory);
+
         if (history.length === 0) {
             list.innerHTML = `<p style="font-size: 11px; color: #94a3b8; text-align: center;">No history yet.</p>`;
             return;
         }
 
-        list.innerHTML = history.map((item, index) => `
+        list.innerHTML = history.map((item, index) => {
+            const isSaved = savedKeys.has(buildHistoryKey(item));
+            return `
             <div class="history-card" data-index="${index}">
                 <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35;">
                     ${escapeHtml(item.question)}
                 </div>
                 <div style="font-size: 10px; opacity: 0.6;">${escapeHtml(item.date)}</div>
                 <div class="history-answer">${escapeHtml(item.answer)}</div>
-                <button class="copy-history-btn">Copy Answer</button>
+                <div class="history-actions">
+                    <button class="copy-history-btn history-action-btn">Copy Answer</button>
+                    <button class="save-history-btn history-action-btn" ${isSaved ? "disabled" : ""}>${isSaved ? "Saved" : "Star"}</button>
+                </div>
             </div>
-        `).join("");
+        `;
+        }).join("");
 
         document.querySelectorAll(".history-card").forEach(card => {
             card.onclick = () => {
@@ -233,7 +253,118 @@ function renderHistory() {
                     }
                 };
             }
+
+            const saveBtn = card.querySelector(".save-history-btn");
+            if (saveBtn) {
+                saveBtn.onclick = (event) => {
+                    event.stopPropagation();
+                    if (saveBtn.disabled) return;
+                    const cardIndex = Number(card.dataset.index);
+                    const item = history[cardIndex];
+                    if (!item) return;
+
+                    saveEntryForLater(item);
+                };
+            }
         });
+    });
+}
+
+function renderSavedHistory(savedList, savedHistory) {
+    if (!savedList) return;
+
+    if (!savedHistory.length) {
+        savedList.innerHTML = `<p style="font-size: 11px; color: #94a3b8; text-align: center;">No saved questions yet.</p>`;
+        return;
+    }
+
+    savedList.innerHTML = savedHistory.map((item, index) => `
+        <div class="history-card" data-saved-index="${index}">
+            <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35;">
+                ${escapeHtml(item.question)}
+            </div>
+            <div style="font-size: 10px; opacity: 0.6;">Saved: ${escapeHtml(item.savedOn || item.date || "")}</div>
+            <div class="saved-answer">${escapeHtml(item.answer)}</div>
+            <div class="history-actions">
+                <button class="copy-saved-btn history-action-btn">Copy Answer</button>
+                <button class="remove-saved-btn history-action-btn danger-btn">Remove</button>
+            </div>
+        </div>
+    `).join("");
+
+    savedList.querySelectorAll(".history-card").forEach((card) => {
+        const index = Number(card.dataset.savedIndex);
+        const item = savedHistory[index];
+        if (!item) return;
+
+        card.onclick = () => {
+            const alreadyOpen = card.classList.contains("open");
+            savedList.querySelectorAll(".history-card.open").forEach((openCard) => {
+                openCard.classList.remove("open");
+            });
+            if (!alreadyOpen) {
+                card.classList.add("open");
+            }
+        };
+
+        const copyBtn = card.querySelector(".copy-saved-btn");
+        if (copyBtn) {
+            copyBtn.onclick = async (event) => {
+                event.stopPropagation();
+                try {
+                    await navigator.clipboard.writeText(item.answer || "");
+                    copyBtn.innerText = "Copied!";
+                    setTimeout(() => {
+                        copyBtn.innerText = "Copy Answer";
+                    }, 1200);
+                } catch (error) {
+                    copyBtn.innerText = "Copy failed";
+                    setTimeout(() => {
+                        copyBtn.innerText = "Copy Answer";
+                    }, 1200);
+                }
+            };
+        }
+
+        const removeBtn = card.querySelector(".remove-saved-btn");
+        if (removeBtn) {
+            removeBtn.onclick = (event) => {
+                event.stopPropagation();
+                removeSavedEntry(index);
+            };
+        }
+    });
+}
+
+function buildHistoryKey(item) {
+    return `${item?.question || ""}|||${item?.answer || ""}`;
+}
+
+function saveEntryForLater(item) {
+    chrome.storage.local.get(["savedHistory"], (result) => {
+        const savedHistory = result.savedHistory || [];
+        const entryKey = buildHistoryKey(item);
+        const alreadySaved = savedHistory.some((savedItem) => buildHistoryKey(savedItem) === entryKey);
+        if (alreadySaved) {
+            renderHistory();
+            return;
+        }
+
+        const newSavedEntry = {
+            question: item.question,
+            answer: item.answer,
+            date: item.date,
+            savedOn: new Date().toLocaleDateString()
+        };
+        chrome.storage.local.set({ savedHistory: [newSavedEntry, ...savedHistory] }, () => renderHistory());
+    });
+}
+
+function removeSavedEntry(indexToRemove) {
+    chrome.storage.local.get(["savedHistory"], (result) => {
+        const savedHistory = result.savedHistory || [];
+        const updated = savedHistory.filter((_, index) => index !== indexToRemove);
+        chrome.storage.local.set({ savedHistory: updated }, () => renderHistory());
     });
 }
 
