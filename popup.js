@@ -196,6 +196,7 @@ function renderHistory() {
                 </div>
                 <div style="font-size: 10px; opacity: 0.6;">${escapeHtml(item.date)}</div>
                 <div class="history-answer">${escapeHtml(item.answer)}</div>
+                <button class="copy-history-btn">Copy Answer</button>
             </div>
         `).join("");
 
@@ -209,6 +210,29 @@ function renderHistory() {
                     card.classList.add("open");
                 }
             };
+
+            const copyBtn = card.querySelector(".copy-history-btn");
+            if (copyBtn) {
+                copyBtn.onclick = async (event) => {
+                    event.stopPropagation();
+                    const cardIndex = Number(card.dataset.index);
+                    const answer = history[cardIndex]?.answer || "";
+                    if (!answer) return;
+
+                    try {
+                        await navigator.clipboard.writeText(answer);
+                        copyBtn.innerText = "Copied!";
+                        setTimeout(() => {
+                            copyBtn.innerText = "Copy Answer";
+                        }, 1200);
+                    } catch (error) {
+                        copyBtn.innerText = "Copy failed";
+                        setTimeout(() => {
+                            copyBtn.innerText = "Copy Answer";
+                        }, 1200);
+                    }
+                };
+            }
         });
     });
 }
