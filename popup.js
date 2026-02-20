@@ -1,6 +1,7 @@
 // --- INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
     initTabs();
+    initApiKeyPanel();
     updateUIForSavedResume();
     initTheme();
     renderHistory(); // Load previous answers on startup
@@ -62,6 +63,27 @@ function initTabs() {
     historyBtn.addEventListener("click", () => setActiveTab("history"));
 }
 
+function initApiKeyPanel() {
+    const toggleBtn = document.getElementById("toggleApiKeyBtn");
+    if (!toggleBtn) return;
+    toggleBtn.addEventListener("click", () => {
+        const section = document.getElementById("apiKeySection");
+        section.classList.toggle("open");
+    });
+}
+
+function setApiKeyPanelOpen(open) {
+    const section = document.getElementById("apiKeySection");
+    if (!section) return;
+    section.classList.toggle("open", open);
+}
+
+function updateApiKeyTrigger(hasKey) {
+    const toggleBtn = document.getElementById("toggleApiKeyBtn");
+    if (!toggleBtn) return;
+    toggleBtn.innerText = hasKey ? "Update Gemini API Key" : "Add Gemini API Key";
+}
+
 function initApiKeySettings() {
     const input = document.getElementById("apiKeyInput");
     const saveBtn = document.getElementById("saveApiKeyBtn");
@@ -71,6 +93,7 @@ function initApiKeySettings() {
         if (result.geminiApiKey) {
             input.value = result.geminiApiKey;
         }
+        updateApiKeyTrigger(Boolean(result.geminiApiKey));
         updateApiKeyStatus(Boolean(result.geminiApiKey));
     });
 
@@ -81,14 +104,18 @@ function initApiKeySettings() {
             return;
         }
         chrome.storage.local.set({ geminiApiKey: key }, () => {
+            updateApiKeyTrigger(true);
             updateApiKeyStatus(true, "API key saved on this device.");
+            setApiKeyPanelOpen(false);
         });
     });
 
     clearBtn.addEventListener("click", () => {
         chrome.storage.local.remove("geminiApiKey", () => {
             input.value = "";
+            updateApiKeyTrigger(false);
             updateApiKeyStatus(false, "API key removed.");
+            setApiKeyPanelOpen(false);
         });
     });
 }
@@ -164,7 +191,7 @@ function renderHistory() {
 
         list.innerHTML = history.map((item, index) => `
             <div class="history-card" data-index="${index}">
-                <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <div style="font-size: 11px; font-weight: 700; margin-bottom: 2px; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.35;">
                     ${escapeHtml(item.question)}
                 </div>
                 <div style="font-size: 10px; opacity: 0.6;">${escapeHtml(item.date)}</div>
@@ -261,6 +288,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     if (!question) { status.innerText = "Please paste the question."; return; }
     if (!apiKey) {
         status.innerText = "Please save your Gemini API key first.";
+        setApiKeyPanelOpen(true);
         return;
     }
 

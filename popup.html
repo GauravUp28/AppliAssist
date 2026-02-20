@@ -82,6 +82,22 @@
             display: block;
         }
 
+        .api-key-trigger {
+            margin: 12px 0 8px 0;
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+
+        .api-key-panel {
+            display: none;
+            margin: 8px 0 12px 0;
+        }
+
+        .api-key-panel.open {
+            display: block;
+        }
+
         .theme-switch-wrapper {
             display: flex;
             justify-content: flex-end;
@@ -264,6 +280,12 @@
             color: #ffffff;
         }
 
+        body.dark-mode .api-key-trigger {
+            background: #1e293b;
+            color: #f1f5f9;
+            border: 1px solid #334155;
+        }
+
         body.dark-mode #status {
             color: #f1f5f9 !important;
             line-height: 1.6;
@@ -366,7 +388,8 @@
                 <input type="file" id="resumeUpload" accept=".docx" />
             </div>
 
-            <div id="apiKeySection" style="margin: 12px 0;">
+            <button id="toggleApiKeyBtn" class="api-key-trigger">Manage Gemini API Key</button>
+            <div id="apiKeySection" class="api-key-panel">
                 <label>Gemini API Key</label>
                 <input type="password" id="apiKeyInput" placeholder="Paste your key" style="width: 100%; margin-bottom: 8px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-sizing: border-box; font-family: 'Inter', sans-serif; font-size: 12px;" />
                 <div style="display: flex; gap: 8px;">
