@@ -1,4 +1,4 @@
-﻿# AppliAssist
+# AppliAssist
 
 <p align="center">
   <img src="icons/icon.png" alt="AppliAssist Logo" width="1000" />
@@ -6,67 +6,63 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Manifest-V3-blue" alt="Manifest V3" />
-  <img src="https://img.shields.io/badge/Author-Gaurav Upadhyay-red" alt="Author: Gaurav Upadhyay" />
+  <img src="https://img.shields.io/badge/Version-1.1-informational" alt="Version 1.1" />
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License: MIT" />
-  
 </p>
 
-> Smart Chrome extension for faster, tailored job application answers.
+Smart Chrome extension for generating concise, tailored job application answers from your resume and the active job page.
 
-AppliAssist helps generate concise application responses using:
-- your resume (`.docx`)
-- the job description on the active page
+## What It Does
+
+AppliAssist combines:
+- your resume (`.docx`, parsed locally)
+- the current tab's cleaned job description text
 - your own Gemini API key
 
-## Features
+Then it generates a short, application-ready response and saves it to local history.
 
-- Resume upload and local parsing (`.docx`)
-- User-managed Gemini API key (saved locally)
-- AI-generated tailored answers
-- One-click copy to clipboard
-- Recent answer history in popup
-- Light/Dark theme support
+## Current Features
+
+- Answer generation from resume + page context + question
+- Resume workflow: upload `.docx`, auto-save parsed resume text locally, view parsed resume text in a modal, and clear stored resume anytime
+- Gemini API key management: add or update key, clear key, and view inline key status messaging
+- History tab includes `Starred` answers and `Recent Questions` (latest generated answers, up to 10)
+- Per-history actions: copy answer, star an answer from recent history, and remove an answer from starred history
+- Clear controls for both recent history and starred history
+- Light/Dark theme toggle (persisted locally)
 
 ## Quick Setup
 
 1. Clone this repository.
 2. Open `chrome://extensions/`.
-3. Turn on **Developer mode**.
-4. Click **Load unpacked** and select this project folder.
-5. Click the extension icon and paste your Gemini API key into the **Gemini API Key** field to get started.
+3. Turn on Developer mode.
+4. Click Load unpacked and select this project folder.
+5. Open AppliAssist and add your Gemini API key under `Manage Gemini API Key`.
 
 ## Usage
 
-1. Open the extension popup.
-2. Paste your Gemini API key and click **Save Key**.
-3. Upload your resume (`.docx`) once.
-4. Open a job post page.
-5. Paste a question and click **Generate Answer**.
+1. Open a job post page in your browser.
+2. Open AppliAssist.
+3. Upload resume (`.docx`) once, or reuse previously saved resume text.
+4. Enter the application question.
+5. Optionally add extra context.
+6. Click `Generate Answer`.
+7. Use copy or star actions from the result and History tab.
 
-## Privacy and Security
+## Privacy and Storage
 
-- API keys are user-provided and stored in `chrome.storage.local`.
-- No production API key is bundled in this repo.
-- Resume text and answer history are stored locally in the browser profile.
+- API key is user-provided and stored in `chrome.storage.local`.
+- Resume text, app history, saved/starred history, and theme are stored locally in the browser profile.
+- No API key is bundled in this repository.
 
-## Core Files
+## Project Files
 
-- `manifest.json` - extension config and permissions
-- `popup.html` - popup UI
-- `popup.js` - main extension logic
-- `content.js` - page text reader
-- `mammoth.js` - DOCX text extraction library
-
-## What's Next
-
-- Improve job-description extraction using targeted DOM selectors.
-- Add support for more resume formats (like PDF).
-- Let users tune tone and answer length from the popup.
-- Add optional export/download for answer history.
-
----
+- `manifest.json` - extension metadata, permissions, and content script wiring
+- `popup.html` - popup layout and UI styles
+- `popup.js` - popup behavior, storage, API requests, and history logic
+- `content.js` - page text extraction and cleanup for job descriptions
+- `mammoth.js` - DOCX to HTML/text conversion
 
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
-
