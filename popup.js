@@ -386,8 +386,23 @@ async function fetchAnswer(resumeText, jobText, questionText, additionalContext,
     const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const contextSection = additionalContext ? ` Additional Context: ${additionalContext}.` : "";
-    const promptText = `You are a software engineer writing application answers. Resume: ${resumeText}. Job: ${jobText}. Question: ${questionText}.${contextSection} Answer in natural human tone, active voice, max 100 words, no contractions, no dashes.`;
-
+    const promptText =
+        "You are writing an application answer on behalf of Gaurav Upadhyay, a full stack software engineer with strong backend and AWS experience. " +
+        "Use only facts from the resume and align the answer tightly to the job description. " +
+        "Prioritize the most relevant experience, measurable impact, and ownership. " +
+        "Write in a natural human tone and active voice. " +
+        "Keep it under 100 words. " +
+        "Do not use contractions. " +
+        "Do not use dashes or bullet points. " +
+        "Use simple sentences and minimal punctuation. " +
+        "Do not mention that you used a resume or job description. " +
+        "Answer the question directly.\n\n" +
+        "Resume text:\n" + resumeText + "\n\n" +
+        "Job text:\n" + jobText + "\n\n" +
+        "Question text:\n" + questionText + "\n\n" +
+        (contextSection ? "Extra context:\n" + contextSection + "\n\n" : "") +
+        "Answer:";
+        
     try {
         const response = await fetch(apiEndpoint, {
             method: "POST",
@@ -482,7 +497,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 function processAndGenerate(resumeText, question, additionalContext, apiKey) {
     document.getElementById("loader").style.display = "block";
     document.getElementById("generateBtn").disabled = true;
-    
+
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, { action: "readJobDescription" }, (response) => {
             fetchAnswer(
