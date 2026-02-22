@@ -388,14 +388,11 @@ async function fetchAnswer(resumeText, jobText, questionText, additionalContext,
     const contextSection = additionalContext ? ` Additional Context: ${additionalContext}.` : "";
     const promptText =
         "You are writing a job application answer for a full stack software engineer with strong backend, distributed systems, AWS, and AI experience. " +
-        "Use only the information provided in the resume and align the response closely with the job description. " +
-        "Highlight measurable impact, ownership, and relevant technical depth. " +
         "Write in a natural human tone using active voice. " +
         "Keep the response under 100 words. " +
         "Do not use contractions. " +
         "Do not use dashes or bullet points. " +
         "Use simple sentences with minimal punctuation. " +
-        "Do not mention the resume or job description explicitly. " +
         "Answer the question directly and confidently.\n\n" +
         "Resume text:\n" + resumeText + "\n\n" +
         "Job text:\n" + jobText + "\n\n" +
