@@ -387,18 +387,19 @@ async function fetchAnswer(resumeText, jobText, questionText, additionalContext,
 
     const contextSection = additionalContext ? ` Additional Context: ${additionalContext}.` : "";
     const promptText =
-        "You are writing a job application answer for a full stack software engineer with strong backend, distributed systems, AWS, and AI experience. " +
-        "Write in a natural human tone using active voice. " +
-        "Keep the response under 100 words. " +
-        "Do not use contractions. " +
-        "Do not use dashes or bullet points. " +
-        "Use simple sentences with minimal punctuation. " +
-        "Answer the question directly and confidently.\n\n" +
-        "Resume text:\n" + resumeText + "\n\n" +
-        "Job text:\n" + jobText + "\n\n" +
-        "Question text:\n" + questionText + "\n\n" +
-        (contextSection ? "Additional context:\n" + contextSection + "\n\n" : "") +
-        "Answer:";
+    "You are writing a job application answer for a full stack software engineer with strong backend, distributed systems, AWS, and AI experience. " +
+    "Write in a natural human tone using active voice. " +
+    "Keep the response under 100 words. " +
+    "Do not use contractions. " +
+    "Do not use bullet points. " +
+    "Use simple sentences with minimal punctuation. " +
+    "Identify the company name from the Job text and explicitly mention it in your answer to personalize the response. " +
+    "Answer the question directly and confidently.\n\n" +
+    "Resume text:\n" + resumeText + "\n\n" +
+    "Job text:\n" + jobText + "\n\n" +
+    "Question text:\n" + questionText + "\n\n" +
+    (contextSection ? "Additional context:\n" + contextSection + "\n\n" : "") +
+    "Answer:";
 
     try {
         const response = await fetch(apiEndpoint, {
